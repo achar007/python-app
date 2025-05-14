@@ -1,6 +1,7 @@
 name: Docker Image CI
 
 on:
+  workflow_dispatch:           # ✅ Enables "Run workflow" button in GitHub UI
   push:
     branches: [ "main" ]
     paths:
@@ -11,9 +12,7 @@ on:
       - source/**
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
