@@ -1,7 +1,7 @@
 name: Docker Image CI
 
 on:
-  workflow_dispatch:           # ✅ Enables "Run workflow" button in GitHub UI
+  workflow_dispatch:  # Enables "Run workflow" button
   push:
     branches:
       - main
@@ -22,10 +22,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Set Docker image tag
+      run: echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_ENV
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag achar007/python-app:$(date +%s)
+      run: docker build . --file Dockerfile --tag achar007/python-app:${{ env.IMAGE_TAG }}
+
+    - name: Push Docker image to Docker Hub
+      run: docker push achar007/python-app:${{ env.IMAGE_TAG }}
