@@ -2,25 +2,35 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [main]  # Adjust this to your main branch
+    branches: [main]  # Adjust this if your default branch has a different name
     paths:
       - 'source/**'       # Trigger only if changes are made under the 'source' folder
       - '.github/workflows/docker-image.yml'  # Optional: include the workflow file itself
+  pull_request:
+    paths:
+      - 'source/**'       # Trigger only if changes are made under the 'source' folder
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Set short SHA
+        id: vars
+        run: echo "SHORT_SHA=${GITHUB_SHA::6}" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: achar007/python-app:${{ github.sha::6 }}
+          tags: achar007/python-app:${{ env.SHORT_SHA }}
