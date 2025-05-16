@@ -22,41 +22,56 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set Docker image tag
-      run: echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_ENV
+      - name: Set Docker image tag
+        run: echo "IMAGE_TAG=$(date +%s)" >> $GITHUB_ENV
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag achar007/python-app:${{ env.IMAGE_TAG }}
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag achar007/python-app:${{ env.IMAGE_TAG }}
 
-    - name: Push Docker image to Docker Hub
-      run: docker push achar007/python-app:${{ env.IMAGE_TAG }}
+      - name: Push Docker image to Docker Hub
+        run: docker push achar007/python-app:${{ env.IMAGE_TAG }}
+
+    outputs:
+      image_id: ${{ env.IMAGE_TAG }}
 
   cd:
     runs-on: self-hosted
     needs: ci
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Install Argocd
-      shell: bash
-      run: |
-        curl -ksSL -o argocd https://argocd-server.argocd/download/argocd-linux-amd64
-        sudo chmod +x argocd
-        sudo mv ./argocd /usr/local/bin/argocd
+      - name: Update image tag in values.yaml
+        shell: bash
+        run: |
+          echo  ${{ needs.ci.outputs.image_id }}
+          pip install yq
+          yq -Yi '.image.tag = "${{ needs.ci.outputs.image_id }}"' -i charts/python-app/values.yaml
 
-    - name: Argocd app sync
-      shell: bash
-      run: |
-        argocd login argocd-server.argocd --insecure --grpc-web \
-        --username admin \
-        --password ${{ secrets.ARGOCD_PASSWORD }}
-        argocd app sync argocd/python-app
+      - name: Commit and push changes
+        uses: endbug/add-and-commit@v9
+        with:
+          message: "Update image tag to ${{ needs.ci.outputs.image_id }}"
+
+      - name: Install Argocd
+        shell: bash
+        run: |
+          curl -ksSL -o argocd https://argocd-server.argocd/download/argocd-linux-amd64
+          sudo chmod +x argocd
+          sudo mv ./argocd /usr/local/bin/argocd
+
+      - name: Argocd app sync
+        shell: bash
+        run: |
+          argocd login argocd-server.argocd --insecure --grpc-web \
+          --username admin \
+          --password ${{ secrets.ARGOCD_PASSWORD }}
+          argocd app sync argocd/python-app
