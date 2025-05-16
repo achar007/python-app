@@ -54,7 +54,7 @@ jobs:
         run: |
           echo  ${{ needs.ci.outputs.image_id }}
           pip install yq
-          yq -Yi '.image.tag = "${{ needs.ci.outputs.image_id }}"' -i charts/python-app/values.yaml
+          yq -Yi '.image.tag = "${{ needs.ci.outputs.image_id }}"' charts/python-app/values.yaml
 
       - name: Commit and push changes
         uses: endbug/add-and-commit@v9
