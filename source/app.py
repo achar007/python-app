@@ -20,7 +20,7 @@ def details():
         'time': datetime.datetime.now(),
         'hostname': socket.gethostname(),
         'message': 'This is my first project in Devops, Hurray! :-)',
-        'message': 'just adding a line'
+        'message': 'just adding a line 1'
     })
 
 @app.route('/api/v1/healthz')
