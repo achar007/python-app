@@ -60,6 +60,10 @@ jobs:
         uses: endbug/add-and-commit@v9
         with:
           message: "Update image tag to ${{ needs.ci.outputs.image_id }}"
+          add: .
+          push: true
+          fetch: --tags --force
+          rebase: true   # <-- Add this to rebase local commits on top of remote changes
 
       - name: Install Argocd
         shell: bash
