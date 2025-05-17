@@ -2,7 +2,7 @@ replicaCount: 1
 image:
   repository: docker.io/achar007/python-app
   pullPolicy: IfNotPresent
-  tag: "1747495047"
+  tag: "1747496767"
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
