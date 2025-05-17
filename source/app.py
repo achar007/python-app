@@ -20,7 +20,7 @@ def details():
         'time': datetime.datetime.now(),
         'hostname': socket.gethostname(),
         'message': 'This is my first project in Devops, Hurray! :-)',
-        'message': "Great step for devops !!!",
+        'message': "Great step for devops !!!!",
         'message': "adding a line 123"
     })
 
