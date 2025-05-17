@@ -49,19 +49,19 @@ jobs:
 
       - name: Install yq
         run: |
-          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
+
+      - name: Git pull with rebase (before changing values.yaml)
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git pull --rebase origin main
 
       - name: Update image tag in values.yaml
         run: |
           echo "Using tag: ${{ needs.ci.outputs.image_id }}"
           yq -i '.image.tag = "${{ needs.ci.outputs.image_id }}"' charts/python-app/values.yaml
-
-      - name: Pull with rebase to avoid non-fast-forward error
-        run: |
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          git pull --rebase origin main
 
       - name: Commit and push changes
         uses: endbug/add-and-commit@v9
@@ -74,7 +74,7 @@ jobs:
       - name: Install Argo CD CLI
         run: |
           curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-          sudo chmod +x argocd
+          chmod +x argocd
           sudo mv argocd /usr/local/bin/
 
       - name: Argo CD app sync
