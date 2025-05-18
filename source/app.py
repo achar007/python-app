@@ -21,7 +21,8 @@ def details():
         'hostname': socket.gethostname(),
         'message1': "This is my first project in Devops, Hurray! :-)",
         'message2': "Great step for devops !!!!",
-        'message3': "adding a line 123456789"
+        'message3': "adding a line 123456789",
+        "message4": "new line"
     })
 
 @app.route('/api/v1/healthz')
